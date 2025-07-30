@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  cron-service:
+    build:
+      context: ..
+    container_name: cron-container
+    ports:
+      - "8087:8080"  # Externo:Interno
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PALATSI_URL=${PALATSI_URL}
+      - PALATSI_PROD_NEW=${PALATSI_PROD_NEW}
+      - PALATSI_PASS=${PALATSI_PASS}
+      - DOLPHIN_URL=${DOLPHIN_URL}
+      - DOLPHIN_PASS=${DOLPHIN_PASS}
+      - ELLENCE_URL=${ELLENCE_URL}
+      - ELLENCE_PASS=${ELLENCE_PASS}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    restart: unless-stopped
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
