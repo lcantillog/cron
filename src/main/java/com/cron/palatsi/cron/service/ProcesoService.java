@@ -57,6 +57,7 @@ public class ProcesoService implements ProcesoInterfaz {
         String password;
         Optional<List<Pagina>> paginasWeb = paginaRepository.findByPaginaAndEstado();
         if (paginasWeb.isPresent()) {
+            LOGGER.info("Ingreso a proceso Pagina Web->");
             for (Pagina pagina : paginasWeb.get()) {
                 try {
 
@@ -84,6 +85,7 @@ public class ProcesoService implements ProcesoInterfaz {
                             break;
                     }
 
+                    LOGGER.info("Valida credenciales Web->" + pagina.getId());
                     if (!password.trim().equals("") && !url.trim().equals("")) {
 
                         switch (pagina.getFlujoWeb()) {
@@ -119,10 +121,11 @@ public class ProcesoService implements ProcesoInterfaz {
                                      String password) {
         try {
 
-            LOGGER.info("palalala->"+ pagina.getId());
+            LOGGER.info("procesoEnvioRequestShopify->"+ pagina.getId());
             RestTemplate restTemplate = new RestTemplate();
             repository.findAll()
                     .forEach(proceso -> {
+                        LOGGER.info("procesoEnvioRequestShopify armando jso request->"+ pagina.getId());
                         ProductoDTO prod;
                         List<VariantJsonDTO> listVariantsJson = new ArrayList<>();
 
@@ -144,12 +147,13 @@ public class ProcesoService implements ProcesoInterfaz {
                         MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
                         headerss.add("Content-Type", "application/json");
                         headerss.add("X-Shopify-Access-Token", password);
+                        LOGGER.info("procesoEnvioRequestShopify send request->");
 
                         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT,
                                 new HttpEntity<Object>(prod,headerss), String.class);
 
-                        LOGGER.info("getStatusCode ->"+ response.getStatusCode());
-                        LOGGER.info("Status getBody ->"+ response.getBody());
+                        LOGGER.info("procesoEnvioRequestShopify - getStatusCode ->"+ response.getStatusCode());
+                        LOGGER.info("procesoEnvioRequestShopify - Status getBody ->"+ response.getBody());
                         History history = History.builder()
                                 .shopify(proceso.getShopify())
                                 .sku(proceso.getSku())
@@ -167,6 +171,7 @@ public class ProcesoService implements ProcesoInterfaz {
                     });
 
         } catch (Exception e) {
+            LOGGER.info("Error-procesoEnvioRequestShopify " + e.getMessage());
             LOGGER.info("Error " + e.getMessage());
         }
 
