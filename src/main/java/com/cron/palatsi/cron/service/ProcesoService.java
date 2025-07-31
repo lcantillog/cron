@@ -56,6 +56,7 @@ public class ProcesoService implements ProcesoInterfaz {
         String url;
         String password;
         Optional<List<Pagina>> paginasWeb = paginaRepository.findByPaginaAndEstado();
+        LOGGER.info("paginasWeb IS PRESENTEPagina Web->"+paginasWeb.isPresent());
         if (paginasWeb.isPresent()) {
             LOGGER.info("Ingreso a proceso Pagina Web->");
             for (Pagina pagina : paginasWeb.get()) {

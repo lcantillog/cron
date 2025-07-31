@@ -18,10 +18,10 @@ public class CronScheduler {
     @Scheduled(fixedDelay = 3000)
     public void schedulerTaskUsingCronExpression(){
         long now = System.currentTimeMillis()/1000;
-        System.out.println("INICIALIZACION DE ACTUALIZACION DE PRODUCTOS -> "+ now);
+        System.out.println("INICIALIZACION DE PROCESO WEB -> "+ now);
         String result = interfaz.procesoWeb();
         log.info("RESULTADO DE PROCESO =>",result);
-        System.out.println("FINLALIZACION DE ACTUALIZACION DE PRODUCTOS -> "+now);
+        System.out.println("FINLALIZACION DE PROCESO WEB -> "+now);
     }
 
     //0 9,21 * * *
