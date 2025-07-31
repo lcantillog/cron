@@ -27,7 +27,7 @@ public class CronScheduler {
     //0 9,21 * * *
     //Cron expression to run a job twice a day at 9am and 9pm
     //@Scheduled(cron = "0 9,21 * * *")
-    @Scheduled(fixedDelay = 6000)
+  //  @Scheduled(fixedDelay = 6000)
     public void schedulerTaskUsingCron(){
         long now = System.currentTimeMillis()/1000;
         System.out.println("INICIALIZACION DE CREACION DE PRODUCTOS -> "+ now);
