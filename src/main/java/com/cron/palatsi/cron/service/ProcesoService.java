@@ -152,10 +152,15 @@ public class ProcesoService implements ProcesoInterfaz {
                         headerss.add("Content-Type", "application/json");
                         headerss.add("X-Shopify-Access-Token", password);
                         LOGGER.info("procesoEnvioRequestShopify send request->");
+                        ResponseEntity<String> response = null;
+                        try {
+                            response = restTemplate.exchange(url, HttpMethod.PUT,
+                                    new HttpEntity<Object>(prod, headerss), String.class);
+                        }catch (Exception e){
+                            LOGGER.info("procesoEnvioRequestShopify Error - getStatusCode ->"+ response.getStatusCode());
+                            LOGGER.info("procesoEnvioRequestShopify Error - Status getBody ->"+ response.getBody());
 
-                        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT,
-                                new HttpEntity<Object>(prod,headerss), String.class);
-
+                        }
                         LOGGER.info("procesoEnvioRequestShopify - getStatusCode ->"+ response.getStatusCode());
                         LOGGER.info("procesoEnvioRequestShopify - Status getBody ->"+ response.getBody());
                         History history = History.builder()
