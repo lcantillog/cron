@@ -87,8 +87,11 @@ public class ProcesoService implements ProcesoInterfaz {
                     }
 
                     LOGGER.info("Valida credenciales Web->" + pagina.getId());
+                    LOGGER.info("Valida credenciales pp->" + password);
+                    LOGGER.info("Valida credenciales uu->" + url);
                     if (!password.trim().equals("") && !url.trim().equals("")) {
 
+                        LOGGER.info("switch pagina.getFlujoWeb()->" + pagina.getFlujoWeb());
                         switch (pagina.getFlujoWeb()) {
                             case "Shopify":
                                 procesoEnvioRequestShopify(pagina, url, password);
