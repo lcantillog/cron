@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +123,7 @@ public class ProcesoService implements ProcesoInterfaz {
     private void procesoEnvioRequestShopify(Pagina pagina,
                                      String url,
                                      String password) {
-        try {
+        //try {
 
             LOGGER.info("procesoEnvioRequestShopify->"+ pagina.getId());
             RestTemplate restTemplate = new RestTemplate();
@@ -154,13 +154,25 @@ public class ProcesoService implements ProcesoInterfaz {
                         LOGGER.info("procesoEnvioRequestShopify send request->");
                         ResponseEntity<String> response = null;
                         try {
-                            response = restTemplate.exchange(url, HttpMethod.PUT,
-                                    new HttpEntity<Object>(prod, headerss), String.class);
-                        }catch (Exception e){
-                            LOGGER.info("procesoEnvioRequestShopify Error - getStatusCode ->"+ response.getStatusCode());
-                            LOGGER.info("procesoEnvioRequestShopify Error - Status getBody ->"+ response.getBody());
-
+                             response = restTemplate.exchange(
+                                    url,
+                                    HttpMethod.PUT,
+                                    new HttpEntity<Object>(prod, headerss),
+                                    String.class
+                            );
+                            LOGGER.info("procesoEnvioRequestShopify send OK request->");
+                            // Puedes trabajar con response aquí
+                        } catch (HttpClientErrorException | HttpServerErrorException ex) {
+                            // Errores HTTP (4xx o 5xx)
+                            System.err.println("Error de respuesta HTTP: " + ex.getStatusCode() + " - " + ex.getResponseBodyAsString());
+                        } catch (ResourceAccessException ex) {
+                            // Problemas de conexión
+                            System.err.println("Error de acceso al recurso: " + ex.getMessage());
+                        } catch (RestClientException ex) {
+                            // Cualquier otro error del cliente
+                            System.err.println("Error en RestTemplate: " + ex.getMessage());
                         }
+
                         LOGGER.info("procesoEnvioRequestShopify - getStatusCode ->"+ response.getStatusCode());
                         LOGGER.info("procesoEnvioRequestShopify - Status getBody ->"+ response.getBody());
                         History history = History.builder()
@@ -179,10 +191,10 @@ public class ProcesoService implements ProcesoInterfaz {
                         repository.delete(proceso);
                     });
 
-        } catch (Exception e) {
-            LOGGER.info("Error-procesoEnvioRequestShopify " + e.getMessage());
-            LOGGER.info("Error " + e.getMessage());
-        }
+       // } catch (Exception e) {
+       //     LOGGER.info("Error-procesoEnvioRequestShopify " + e.getMessage());
+         //   LOGGER.info("Error " + e.getMessage());
+        //}
 
     }
     private void procesoEnvioRequest(Pagina pagina,
