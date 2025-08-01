@@ -51,13 +51,13 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
 my:
   url:
-    palatsi: "https://staging.palatsi.com.co/wp-json/netsat/v1/update_product"
-    palatsi_prod_new: "https://staging.palatsi.com.co/wp-json/netsat/v1/get_new_products"
-    dolphin: "dsds"
-    ellence: ""
-    prueba: "https://staging.palatsi.com.co/wp-json/netsat/v1/update_product"
-    pass_palatsi: "!mP* wU^n{li<xaMGmv1^aXUI>=v`@(sfCMG$TCZ"
-    pass_dolphin: "1ae378481a17be9c07893adba022f366"
-    pass_ellence: ""
-    pass_prueba: "!mP* wU^n{li<xaMGmv1^aXUI>=v`@(sfCMG$TCZ"
+    palatsi:  ${PALATSI_URL}
+    palatsi_prod_new:  ${PALATSI_PROD_NEW}
+    dolphin:  ${DOLPHIN_URL}
+    ellence:  ${ELLENCE_URL}
+    prueba:  ${PALATSI_URL}
+    pass_palatsi:  ${PALATSI_PASS}
+    pass_dolphin:  ${DOLPHIN_PASS}
+    pass_ellence:  ${ELLENCE_PASS}
+    pass_prueba:  ${PALATSI_PASS}
 
