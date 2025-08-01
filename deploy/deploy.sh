@@ -1,3 +1,4 @@
-#!/bin/bash
-export $(cat .env | xargs)
-java -jar cron.jar
+set -o allexport
+source .env
+set +o allexport
+java -jar cron.jar --spring.profiles.active=prod

@@ -27,7 +27,7 @@ spring:
   datasource:
     url: jdbc:sqlserver://localhost;database=PALATSI_43VO02;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    username: my
+    username: sa
     password: S3rv3r.123
 
   # ===============================
