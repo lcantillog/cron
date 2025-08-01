@@ -25,7 +25,7 @@ spring:
     # password: S3rv3r.123
     # driverClassName: org.h2.Driver
   datasource:
-    url: ${DB_URL}
+    url: jdbc:sqlserver://${DB_URL};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
