@@ -55,11 +55,12 @@ public class ProcesoService implements ProcesoInterfaz {
     public String procesoWeb() {
         String url;
         String password;
-        Optional<List<Pagina>> paginasWeb = paginaRepository.findByPaginaAndEstado();
-        LOGGER.info("paginasWeb IS PRESENTEPagina Web->"+paginasWeb.isPresent());
-        if (paginasWeb.isPresent()) {
+        LOGGER.info("paginasWeb IS PRESENTEPagina Web antes->");
+        List<Pagina> paginasWeb = paginaRepository.findByPaginaAndEstado();
+        LOGGER.info("paginasWeb IS PRESENTEPagina Web->"+paginasWeb.isEmpty());
+        if (!paginasWeb.isEmpty()) {
             LOGGER.info("Ingreso a proceso Pagina Web->");
-            for (Pagina pagina : paginasWeb.get()) {
+            for (Pagina pagina : paginasWeb) {
                 try {
 
                     LOGGER.info("Pagina Web->" + pagina.getId());

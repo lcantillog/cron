@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface PaginaRepository extends JpaRepository<Pagina, String> {
     @Query(value = "SELECT p FROM Pagina p WHERE p.estado = 'ACTIVO'")
-    Optional<List<Pagina>> findByPaginaAndEstado();
+    List<Pagina> findByPaginaAndEstado();
 }
