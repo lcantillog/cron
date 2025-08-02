@@ -1,6 +1,6 @@
 #Application Configuration
 server:
-  port: 8092
+  port: 8091
 
 security:
   basic:
@@ -25,18 +25,18 @@ spring:
     # password: S3rv3r.123
     # driverClassName: org.h2.Driver
   datasource:
-    url: jdbc:sqlserver://${DB_URL};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:sqlserver://localhost;database=PALATSI_43VO02;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: my
+    password: S3rv3r.123
 
   # ===============================
   # JPA / HIBERNATE
   # ===============================
   jpa:
     show-sql: true
-   # hibernate:
-   #   ddl-auto: update
+    # hibernate:
+    #   ddl-auto: update
     database-platform: org.hibernate.dialect.SQLServer2012Dialect
     properties:
       hibernate:
