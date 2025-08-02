@@ -51,12 +51,12 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
 my:
   url:
-    palatsi:  ${PALATSI_URL}
+    palatsi: https://f3e753d36a1a0df08e8d6017ab9c9801:1ae378481a17be9c07893adba022f366@palatsi-com-co.myshopify.com/admin/api/2019-10/products/
     palatsi_prod_new:  ${PALATSI_PROD_NEW}
     dolphin:  ${DOLPHIN_URL}
     ellence:  ${ELLENCE_URL}
     prueba:  ${PALATSI_URL}
-    pass_palatsi:  ${PALATSI_PASS}
+    pass_palatsi: 1ae378481a17be9c07893adba022f366
     pass_dolphin:  ${DOLPHIN_PASS}
     pass_ellence:  ${ELLENCE_PASS}
     pass_prueba:  ${PALATSI_PASS}
