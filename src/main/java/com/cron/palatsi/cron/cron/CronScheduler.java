@@ -15,7 +15,7 @@ public class CronScheduler {
     @Autowired
     private ProductoInterfaz productoInterfaz;
 
-    @Scheduled(fixedDelay = 3000)
+    @Scheduled(fixedDelay = 15000)
     public void schedulerTaskUsingCronExpression(){
         long now = System.currentTimeMillis()/1000;
         System.out.println("INICIALIZACION DE PROCESO WEB -> "+ now);
