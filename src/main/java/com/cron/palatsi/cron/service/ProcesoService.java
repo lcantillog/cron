@@ -1,5 +1,131 @@
 package com.cron.palatsi.cron.service;
 
+import com.cron.palatsi.cron.interfaz.ProcesoInterfaz;
+import com.cron.palatsi.cron.dto.ProductJsonDTO;
+import com.cron.palatsi.cron.dto.ProductoDTO;
+import com.cron.palatsi.cron.dto.VariantJsonDTO;
+import com.cron.palatsi.cron.entity.History;
+import com.cron.palatsi.cron.entity.Proceso;
+import com.cron.palatsi.cron.pojo.MyPropertyPojo;
+import com.cron.palatsi.cron.repository.HisotryRepository;
+import com.cron.palatsi.cron.repository.ProcesoRepository;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ProcesoService implements ProcesoInterfaz {
+
+    @Autowired
+    private final ProcesoRepository repository;
+
+    @Autowired
+    private final HisotryRepository hisotryRepository;
+
+    @Autowired
+    private final MyPropertyPojo property;
+
+    private final Log LOGGER = LogFactory.getLog(this.getClass());
+
+    @Override
+    public List<Proceso> listAllProceso() {
+        return repository.findAll();
+    }
+
+    @Override
+    public String procesoWeb() {
+        LOGGER.info("URL PAGINA->"+ property.getPalatsi());
+        RestTemplate restTemplate = new RestTemplate();
+        repository.findAll()
+                .forEach(proceso -> {
+                    try {
+                        String url, password;
+
+                        LOGGER.info("------- PAGINA->" + proceso.getPagina());
+                        switch (proceso.getPagina().toUpperCase()) {
+                            case "PALATSI":
+                                url = property.getPalatsi() + proceso.getShopify().trim() + ".json";
+                                password = property.getPass_palatsi();
+                                break;
+                            case "DOLPHIN":
+                                url = property.getDolphin() + proceso.getShopify().trim() + ".json";
+                                password = property.getPass_dolphin();
+                                break;
+                            case "ELLENCCE":
+                                url = property.getEllencce() + proceso.getShopify().trim() + ".json";
+                                password = property.getPass_ellencce();
+                                break;
+                            default:
+                                url = property.getPalatsi() + proceso.getShopify().trim() + ".json";
+                                password = property.getPass_palatsi();
+                                break;
+                        }
+                        LOGGER.info("URL PAGINA->" + url);
+                        ProductoDTO prod;
+                        List<VariantJsonDTO> listVariantsJson = new ArrayList<>();
+
+                        VariantJsonDTO variantJson = VariantJsonDTO.builder()
+                                .sku(proceso.getSku())
+                                .price(proceso.getPrecio())
+                                .compareAtPrice(proceso.getPrecioAnterior())
+                                .inventoryQuantity(proceso.getCantidad()).build();
+
+                        listVariantsJson.add(variantJson);
+
+                        ProductJsonDTO productJson = ProductJsonDTO.builder()
+                                .id(proceso.getShopify())
+                                .variants(listVariantsJson)
+                                .build();
+
+                        prod = ProductoDTO.builder().product(productJson).build();
+
+                        LOGGER.info("antes de LinkedMultiValueMap->");
+                        MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
+                        headerss.add("Content-Type", "application/json");
+                        headerss.add("X-Shopify-Access-Token", password);
+
+                        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT,
+                                new HttpEntity<Object>(prod, headerss), String.class);
+
+                        LOGGER.info("getStatusCode ->" + response.getStatusCode());
+                        LOGGER.info("Status getBody ->" + response.getBody());
+                        History history = History.builder()
+                                .shopify(proceso.getShopify())
+                                .sku(proceso.getSku())
+                                .pagina(proceso.getPagina())
+                                .cantidad(proceso.getCantidad())
+                                .fecha(proceso.getFecha())
+                                .precio(proceso.getPrecio())
+                                .precioAnterior(proceso.getPrecioAnterior())
+                                .path(url)
+                                .request(prod.toString())
+                                .response(response.getBody()).build();
+
+                        hisotryRepository.save(history);
+                        repository.delete(proceso);
+                    }catch (HttpClientErrorException e){
+                        LOGGER.info("Producto no encontrado validar codigo shopify ->" + proceso.getShopify());
+                    }
+                });
+        return "OK";
+    }
+}
+
+/*package com.cron.palatsi.cron.service;
+
 import com.cron.palatsi.cron.dto.ProcesoDTO;
 import com.cron.palatsi.cron.dto.ProductJsonDTO;
 import com.cron.palatsi.cron.dto.ProductoDTO;
@@ -274,3 +400,4 @@ public class ProcesoService implements ProcesoInterfaz {
                         .price(a.getPrecio()).build()).collect(Collectors.toList());
     }
 }
+*/
