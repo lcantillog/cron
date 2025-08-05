@@ -154,9 +154,10 @@ public class ProcesoService implements ProcesoInterfaz {
                         headerss.add("X-Shopify-Access-Token", password);
                         LOGGER.info("procesoEnvioRequestShopify send request->");
                         ResponseEntity<String> response = null;
+                        String urlProd = url +"/" +proceso.getShopify()+".json";
                         try {
                              response = restTemplate.exchange(
-                                    url,
+                                     urlProd,
                                     HttpMethod.PUT,
                                     new HttpEntity<Object>(prod, headerss),
                                     String.class
