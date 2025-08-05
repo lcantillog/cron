@@ -40,7 +40,7 @@ public class ProcesoService implements ProcesoInterfaz {
     private final HisotryRepository hisotryRepository;
 
     @Autowired
-        private final MyPropertyPojo property;
+    private final MyPropertyPojo property;
 
     @Autowired
     private final PaginaRepository paginaRepository;
@@ -57,7 +57,7 @@ public class ProcesoService implements ProcesoInterfaz {
         String password;
         LOGGER.info("paginasWeb IS PRESENTEPagina Web antes->");
         List<Pagina> paginasWeb = paginaRepository.findByPaginaAndEstado();
-        LOGGER.info("paginasWeb IS PRESENTEPagina Web->"+paginasWeb.isEmpty());
+        LOGGER.info("paginasWeb IS PRESENTEPagina Web->" + paginasWeb.isEmpty());
         if (!paginasWeb.isEmpty()) {
             LOGGER.info("Ingreso a proceso Pagina Web->");
             for (Pagina pagina : paginasWeb) {
@@ -122,83 +122,86 @@ public class ProcesoService implements ProcesoInterfaz {
     }
 
     private void procesoEnvioRequestShopify(Pagina pagina,
-                                     String url,
-                                     String password) {
+                                            String url,
+                                            String password) {
         //try {
 
-            LOGGER.info("procesoEnvioRequestShopify->"+ pagina.getId());
-            RestTemplate restTemplate = new RestTemplate();
-            repository.findAll()
-                    .forEach(proceso -> {
-                        LOGGER.info("procesoEnvioRequestShopify armando jso request->"+ pagina.getId());
-                        ProductoDTO prod;
-                        List<VariantJsonDTO> listVariantsJson = new ArrayList<>();
+        LOGGER.info("procesoEnvioRequestShopify->" + pagina.getId());
+        RestTemplate restTemplate = new RestTemplate();
+        repository.findAll()
+                .forEach(proceso -> {
+                    LOGGER.info("procesoEnvioRequestShopify armando jso request->" + pagina.getId());
+                    ProductoDTO prod;
+                    List<VariantJsonDTO> listVariantsJson = new ArrayList<>();
 
-                        VariantJsonDTO variantJson = VariantJsonDTO.builder()
-                                .sku(proceso.getSku())
-                                .price(proceso.getPrecio())
-                                .compareAtPrice(proceso.getPrecioAnterior())
-                                .inventoryQuantity(proceso.getCantidad()).build();
+                    VariantJsonDTO variantJson = VariantJsonDTO.builder()
+                            .sku(proceso.getSku())
+                            .price(proceso.getPrecio())
+                            .compareAtPrice(proceso.getPrecioAnterior())
+                            .inventoryQuantity(proceso.getCantidad()).build();
 
-                        listVariantsJson.add(variantJson);
+                    listVariantsJson.add(variantJson);
 
-                        ProductJsonDTO productJson = ProductJsonDTO.builder()
-                                .id(proceso.getShopify())
-                                .variants(listVariantsJson)
-                                .build();
+                    ProductJsonDTO productJson = ProductJsonDTO.builder()
+                            .id(proceso.getShopify())
+                            .variants(listVariantsJson)
+                            .build();
 
-                        prod = ProductoDTO.builder().product(productJson).build();
+                    prod = ProductoDTO.builder().product(productJson).build();
 
-                        MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
-                        headerss.add("Content-Type", "application/json");
-                        headerss.add("X-Shopify-Access-Token", password);
-                        LOGGER.info("procesoEnvioRequestShopify send request->");
-                        ResponseEntity<String> response = null;
-                        String urlProd = url +"/" +proceso.getShopify()+".json";
-                        try {
-                             response = restTemplate.exchange(
-                                     urlProd,
-                                    HttpMethod.PUT,
-                                    new HttpEntity<Object>(prod, headerss),
-                                    String.class
-                            );
-                            LOGGER.info("procesoEnvioRequestShopify send OK request->");
-                            // Puedes trabajar con response aquí
-                        } catch (HttpClientErrorException | HttpServerErrorException ex) {
-                            // Errores HTTP (4xx o 5xx)
-                            System.err.println("Error de respuesta HTTP: " + ex.getStatusCode() + " - " + ex.getResponseBodyAsString());
-                        } catch (ResourceAccessException ex) {
-                            // Problemas de conexión
-                            System.err.println("Error de acceso al recurso: " + ex.getMessage());
-                        } catch (RestClientException ex) {
-                            // Cualquier otro error del cliente
-                            System.err.println("Error en RestTemplate: " + ex.getMessage());
-                        }
+                    MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
+                    headerss.add("Content-Type", "application/json");
+                    headerss.add("X-Shopify-Access-Token", password);
+                    LOGGER.info("procesoEnvioRequestShopify send request->");
+                    ResponseEntity<String> response = null;
+                    String urlProd = url + "/" + proceso.getShopify() + ".json";
+                    try {
+                        response = restTemplate.exchange(
+                                urlProd,
+                                HttpMethod.PUT,
+                                new HttpEntity<Object>(prod, headerss),
+                                String.class
+                        );
+                        LOGGER.info("procesoEnvioRequestShopify send OK request->");
+                        // Puedes trabajar con response aquí
 
-                        LOGGER.info("procesoEnvioRequestShopify - getStatusCode ->"+ response.getStatusCode());
-                        LOGGER.info("procesoEnvioRequestShopify - Status getBody ->"+ response.getBody());
-                        History history = History.builder()
-                                .shopify(proceso.getShopify())
-                                .sku(proceso.getSku())
-                                .pagina(proceso.getPagina())
-                                .cantidad(proceso.getCantidad())
-                                .fecha(proceso.getFecha())
-                                .precio(proceso.getPrecio())
-                                .precioAnterior(proceso.getPrecioAnterior())
-                                .path(url)
-                                .request(prod.toString())
-                                .codigoEstado(response.getStatusCode().toString())
-                                .response(response.getBody()).build();
-                        hisotryRepository.save(history) ;
+                        LOGGER.info("procesoEnvioRequestShopify - getStatusCode ->" + response.getStatusCode());
+                        LOGGER.info("procesoEnvioRequestShopify - Status getBody ->" + response.getBody());
+
                         repository.delete(proceso);
-                    });
 
-       // } catch (Exception e) {
-       //     LOGGER.info("Error-procesoEnvioRequestShopify " + e.getMessage());
-         //   LOGGER.info("Error " + e.getMessage());
+                    } catch (HttpClientErrorException | HttpServerErrorException ex) {
+                        // Errores HTTP (4xx o 5xx)
+                        System.err.println("Error de respuesta HTTP: " + ex.getStatusCode() + " - " + ex.getResponseBodyAsString());
+                    } catch (ResourceAccessException ex) {
+                        // Problemas de conexión
+                        System.err.println("Error de acceso al recurso: " + ex.getMessage());
+                    } catch (RestClientException ex) {
+                        // Cualquier otro error del cliente
+                        System.err.println("Error en RestTemplate: " + ex.getMessage());
+                    }
+                    History history = History.builder()
+                            .shopify(proceso.getShopify())
+                            .sku(proceso.getSku())
+                            .pagina(proceso.getPagina())
+                            .cantidad(proceso.getCantidad())
+                            .fecha(proceso.getFecha())
+                            .precio(proceso.getPrecio())
+                            .precioAnterior(proceso.getPrecioAnterior())
+                            .path(url)
+                            .request(prod.toString())
+                            .codigoEstado(response.getStatusCode().toString())
+                            .response(response.getBody()).build();
+                    hisotryRepository.save(history);
+                });
+
+        // } catch (Exception e) {
+        //     LOGGER.info("Error-procesoEnvioRequestShopify " + e.getMessage());
+        //   LOGGER.info("Error " + e.getMessage());
         //}
 
     }
+
     private void procesoEnvioRequest(Pagina pagina,
                                      List<Proceso> listaProceso,
                                      String url,
