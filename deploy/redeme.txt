@@ -1,0 +1,36 @@
+1- ejecuta en una terminal bash el siguiente comando:
+
+./gradlew bootJar
+
+Esto generará un archivo .jar en build/libs/.
+
+
+ 2. Crear un archivo externo de configuración
+Por ejemplo, crea un archivo llamado application-external.yml o application-external.properties con tu configuración de base de datos:
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mi_base
+    username: usuario
+    password: clave
+
+
+Guárdalo en una ruta como: /ruta/config/application-external.yml
+
+🚀 3. Ejecutar el .jar usando el archivo externo
+Usa el parámetro --spring.config.location para indicarle a Spring Boot dónde está tu archivo:
+
+		java -jar build/libs/tu-app.jar --spring.config.location=file:/ruta/config/application-external.yml
+
+
+✅ Importante: Usa file: al inicio de la ruta para indicar que es un archivo local.
+
+
+🧠 Alternativa: usar un directorio completo
+Si tienes varios archivos de configuración en una carpeta, puedes pasar el directorio:
+
+		java -jar build/libs/tu-app.jar --spring.config.location=file:/ruta/config/
+
+
+Spring Boot buscará automáticamente application.properties o application.yml en ese directorio.
+
+¿Quieres que te ayude a generar un script .sh o .bat para automatizar esto? También puedo ayudarte a validar que tu archivo externo tenga la estructura correcta para tu tipo de base de datos.

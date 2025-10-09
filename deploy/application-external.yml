@@ -1,0 +1,68 @@
+#Application Configuration
+server:
+  port: 8091
+
+security:
+  basic:
+    enable: false
+  ignored: /**
+
+# To See H2 Console in Browser:
+# http://localhost:8091/h2-console
+# Enabling H2 Console
+spring:
+  application:
+    name: cron-service
+  h2:
+    console:
+      enabled: true
+    # ===============================
+    # DB
+    # ===============================
+    # url: jdbc:h2:mem:productDB;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    # url: jdbc:sqlserver://localhost;database=prueba;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    # url: jdbc:sqlserver://localhost;database=PALATSI_43VO01;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    # password: S3rv3r.123
+    # driverClassName: org.h2.Driver
+  datasource:
+    url: jdbc:sqlserver://192.168.43.160;database=PALATSI_DIGITAL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: my
+    password: S3rv3r.123
+
+  # ===============================
+  # JPA / HIBERNATE
+  # ===============================
+  jpa:
+    show-sql: true
+   # hibernate:
+   #   ddl-auto: update
+    database-platform: org.hibernate.dialect.SQLServer2012Dialect
+    properties:
+      hibernate:
+        show_sql: true
+        use_sql_comments: false
+        format_sql: false
+  sql:
+    init:
+      platform: mssql
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+my:
+  url:
+    palatsi: https://f3e753d36a1a0df08e8d6017ab9c9801:1ae378481a17be9c07893adba022f366@palatsi-com-co.myshopify.com/admin/api/2019-10/products/
+    palatsi_prod_new: https://staging.palatsi.com.co/wp-json/netsat/v1/get_new_products
+    dolphin: https://be42c94aec1b14ce54c71d6694f3de46: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@dolphinrose.myshopify.com/admin/api/2020-07/products/
+    ellence:  ${ELLENCE_URL}
+    prueba:  ${PALATSI_URL}
+    pass_palatsi: 1ae378481a17be9c07893adba022f366
+    pass_palatsi_prod_new: 1ae378481a17be9c07893adba022f366
+    pass_dolphin: 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
+    pass_ellence:  ${ELLENCE_PASS}
+    pass_prueba:  ${PALATSI_PASS}
+scheduler:
+  #procesoWebCron: "0 0/15 * * * *"         # Cada 15 minutos
+  #procesoProductoCron: "0 5/15 * * * *"    # Cada 15 minutos, pero con desfase de 5 minutos
+  procesoWebCron: "0 0/1 * * * *"         # Cada 3 minutos, comenzando en el minuto 0
+  procesoProductoCron: "0 5/15 * * * *"    # Cada 3 minutos, comenzando en el minuto 1 (desfase de 1 minuto)
