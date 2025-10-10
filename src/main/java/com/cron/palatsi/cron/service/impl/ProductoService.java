@@ -1,5 +1,6 @@
 package com.cron.palatsi.cron.service.impl;
 
+import com.cron.palatsi.cron.config.pojo.Property;
 import com.cron.palatsi.cron.dto.SkuDto;
 import com.cron.palatsi.cron.entity.Articulo;
 import com.cron.palatsi.cron.service.ProductoInterfaz;
@@ -7,6 +8,7 @@ import com.cron.palatsi.cron.config.pojo.MyPropertyPojo;
 import com.cron.palatsi.cron.repository.ArticuloRepository;
 import com.cron.palatsi.cron.utility.Constante;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -19,6 +21,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,9 @@ public class ProductoService implements ProductoInterfaz {
 
     @Autowired
     private final MyPropertyPojo property;
+
+    @Autowired
+    private final Property propertys;
 
     @Autowired
     private final ArticuloRepository repository;
@@ -37,7 +44,7 @@ public class ProductoService implements ProductoInterfaz {
 
         MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
         headerss.add("Content-Type", "application/json");
-        headerss.add("x-api-key", property.getPass_palatsi());
+        headerss.add("x-api-key", property.getPass_palatsi_prod_new());
 
         HttpEntity<Object> param = new HttpEntity<Object>( headerss);
         ResponseEntity<SkuDto> response = restTemplate.exchange(property.getPalatsi_prod_new(), HttpMethod.GET,
@@ -69,4 +76,12 @@ public class ProductoService implements ProductoInterfaz {
             return "No se encontraron productos a migrar.";
         }
     }
+
+    public String getUrl(String key) {
+        if (propertys.getUrls() == null || key == null || key.isEmpty()) {
+            return "Clave inválida";
+        }
+        return propertys.getUrls().getOrDefault(key, "URL no encontrada");
+    }
+
 }

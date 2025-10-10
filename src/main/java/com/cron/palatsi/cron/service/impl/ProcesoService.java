@@ -24,8 +24,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -314,8 +313,9 @@ public class ProcesoService implements ProcesoInterfaz {
             MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
             headerss.add("Content-Type", "application/json");
             headerss.add("x-api-key", password);
+            String urlBase = url +"update_product";
             HttpEntity<Object> param = new HttpEntity<Object>(listProcesoDTO, headerss);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST,
+            ResponseEntity<String> response = restTemplate.exchange(urlBase, HttpMethod.POST,
                     param, String.class);
             String request = listProcesoDTO.toString();
             LOGGER.info("getStatusCode ->" + response.getStatusCode());
@@ -343,12 +343,21 @@ public class ProcesoService implements ProcesoInterfaz {
     }
 
     private List<ProcesoDTO> obtenerLista(List<Proceso> procesoList) {
+        if (procesoList == null || procesoList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return procesoList.stream()
-                .map(a -> ProcesoDTO.builder()
-                        .stock(a.getCantidad())
-                        .sku(a.getSku())
-                        .sale_price(a.getPrecioAnterior())
-                        .price(a.getPrecio()).build()).collect(Collectors.toList());
+                .filter(Objects::nonNull)
+                .map(a ->
+                        {
+                        return   ProcesoDTO.builder()
+                                    .stock(a.getCantidad())
+                                    .sku(a.getSku())
+                                    .sale_price(Optional.ofNullable(a.getPrecioAnterior()).orElse((double) 0))
+                                    .price(a.getPrecio()).build();
+                        }
+                ).collect(Collectors.toList());
     }
 
     private void procesoHistoricoAndEliminacionInfo(Pagina pagina,
