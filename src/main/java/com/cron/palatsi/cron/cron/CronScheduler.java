@@ -31,6 +31,12 @@ public class CronScheduler {
     @Value("${scheduler.procesoProductoCron}")
     private String procesoProductoCron;
 
+    @Value("${scheduler.procesoWebActive}")
+    private Boolean procesoWebActive;
+
+    @Value("${scheduler.procesoProductoActive}")
+    private Boolean procesoProductoActive;
+
     public CronScheduler(ProcesoInterfaz interfaz, ProductoInterfaz productoInterfaz) {
         this.interfaz = interfaz;
         this.productoInterfaz = productoInterfaz;
@@ -50,10 +56,12 @@ public class CronScheduler {
     public void scheduleTasks() {
         ScheduledTaskRegistrar registrar = new ScheduledTaskRegistrar();
         registrar.setScheduler(taskScheduler());
-
-        registrar.addCronTask(this::runProcesoWeb, procesoWebCron);
-        registrar.addCronTask(this::runProcesoProducto, procesoProductoCron);
-
+        if(procesoWebActive) {
+            registrar.addCronTask(this::runProcesoWeb, procesoWebCron);
+        }
+        if(procesoProductoActive) {
+            registrar.addCronTask(this::runProcesoProducto, procesoProductoCron);
+        }
         registrar.afterPropertiesSet();
     }
 

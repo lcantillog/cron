@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface ProcesoRepository extends JpaRepository<Proceso,Long> {
     List<Proceso> findAllBy();
 
-    //List<Proceso> findByPagina(String pagina);
-    @Query("SELECT T FROM Proceso T WHERE T.sku ='7707999184010' AND T.pagina =:pagina")
     List<Proceso> findByPagina(String pagina);
+    /*@Query("SELECT T FROM Proceso T WHERE T.sku ='7707999184010' AND T.pagina =:pagina")
+    List<Proceso> findByPagina(String pagina);*/
 }

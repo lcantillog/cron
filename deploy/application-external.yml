@@ -66,3 +66,5 @@ scheduler:
   #procesoProductoCron: "0 5/15 * * * *"    # Cada 15 minutos, pero con desfase de 5 minutos
   procesoWebCron: "0 0/1 * * * *"         # Cada 3 minutos, comenzando en el minuto 0
   procesoProductoCron: "0 5/15 * * * *"    # Cada 3 minutos, comenzando en el minuto 1 (desfase de 1 minuto)
+  procesoWebActive: true
+  procesoProductoActive: false
