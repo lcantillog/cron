@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface PaginaRepository extends JpaRepository<Pagina, String> {
-    @Query(value = "SELECT p FROM Pagina p WHERE p.estado = 'ACTIVO' AND p.id = 'Prueba' ")
+    @Query(value = "SELECT p FROM Pagina p WHERE p.estado = 'ACTIVO' ")
     List<Pagina> findByPaginaAndEstado();
 }
