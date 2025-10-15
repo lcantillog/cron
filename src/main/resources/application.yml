@@ -68,3 +68,8 @@ scheduler:
   procesoWebActive: false
   procesoProductoCron: "0 0/1 * * * *"    # Cada 3 minutos, comenzando en el minuto 1 (desfase de 1 minuto)
   procesoProductoActive: true
+config:
+  empresa: 1
+  listaPrecio: 1
+  bodega: 8
+  pagina: Palatsi

@@ -8,9 +8,9 @@ import com.cron.palatsi.cron.config.pojo.MyPropertyPojo;
 import com.cron.palatsi.cron.repository.ArticuloRepository;
 import com.cron.palatsi.cron.utility.Constante;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -37,6 +37,18 @@ public class ProductoService implements ProductoInterfaz {
     @Autowired
     private final ArticuloRepository repository;
 
+    @Value("${config.empresa}")
+    private Integer empresa;
+
+    @Value("${config.listaPrecio}")
+    private Integer listaPrecio;
+
+    @Value("${config.bodega}")
+    private Integer bodega;
+
+    @Value("${config.pagina}")
+    private String pagina;
+
     @Override
     public String procesoProducto() {
         try {
@@ -55,19 +67,19 @@ public class ProductoService implements ProductoInterfaz {
                 for (String sku : respon.products) {
                     log.info("Service method called using @Slf4j", sku);
                     boolean existe = repository.existsArticuloBySku(sku);
-                    Integer cantidad = repository.getCantidadArticulo(sku);
-                    double precio = repository.getPrecioArticulo(sku);
+                    Integer cantidad = repository.getCantidadArticulo(empresa,bodega,sku);
+                    double precio = repository.getPrecioArticulo(empresa,listaPrecio,sku);
                     if (!existe) {
                         try {
                             Articulo articuloDB = new Articulo();
                             articuloDB.setSku(sku);
                             articuloDB.setShopify(sku);
-                            articuloDB.setPagina(Constante.PALATSI);
+                            articuloDB.setPagina(pagina);
                             articuloDB.setVariante(Constante.VARIANTE);
                             articuloDB.setPrecio(precio);
                             articuloDB.setPrecioAnterio(0);
                             articuloDB.setCantidad(cantidad);
-                            articuloDB.setListaPrecio(Constante.COD_LISTA_PRECIO);
+                            articuloDB.setListaPrecio(listaPrecio);
                             repository.save(articuloDB);
                         }catch (Exception e){
                             System.err.println("Error al intengar guardar el articulo: " + e.getMessage());
