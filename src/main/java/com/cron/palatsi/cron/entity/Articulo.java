@@ -6,6 +6,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.RowId;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,9 +15,13 @@ import javax.persistence.*;
 @Table(name = "ARTISHOP")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Articulo {
+@IdClass(ArticuloId.class) // Composición de clave primaria
+public class Articulo implements Serializable {
+
+    @Id
     @Column(name = "ASCODSKU")
     private String sku;
+    @Id
     @Column(name = "ASCODSHO")
     private String shopify;
     @Column(name = "ASCANTID")
@@ -31,9 +37,5 @@ public class Articulo {
     private double precioAnterio;
     @Column(name = "ASPAGINA")
     private String pagina;
-    @Id
-    @GenericGenerator(name = "generator", strategy = "guid", parameters = {})
-    @GeneratedValue(generator = "generator")
-    @Column(name = "rowguid" , columnDefinition="uniqueidentifier")
-    private String id;
+
 }
