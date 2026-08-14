@@ -21,7 +21,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.*;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -65,13 +67,17 @@ public class ProductoService implements ProductoInterfaz {
                     });
             if (response.getStatusCode() == HttpStatus.OK) {
                 SkuDto respon = response.getBody();
-                for (String sku : respon.products) {
-                    log.info("Service method called using @Slf4j", sku);
-                    boolean existe = repository.existsArticuloBySku(sku);
-                    Integer cantidad = repository.getCantidadArticulo(empresa,bodega,sku);
-                    double precio = repository.getPrecioArticulo(empresa,listaPrecio,sku);
-                    if (!existe) {
-                        try {
+                if (respon == null || respon.products == null) {
+                    return "No se encontraron productos a migrar.";
+                }
+                Set<String> skusUnicos = new LinkedHashSet<>(respon.products);
+                for (String sku : skusUnicos) {
+                    try {
+                        log.info("Service method called using @Slf4j", sku);
+                        boolean existe = repository.existsArticuloBySku(sku);
+                        Integer cantidad = repository.getCantidadArticulo(empresa,bodega,sku);
+                        double precio = repository.getPrecioArticulo(empresa,listaPrecio,sku);
+                        if (!existe) {
                             Articulo articuloDB = new Articulo();
                             articuloDB.setSku(sku);
                             articuloDB.setShopify(sku);
@@ -82,9 +88,9 @@ public class ProductoService implements ProductoInterfaz {
                             articuloDB.setCantidad(cantidad);
                             articuloDB.setListaPrecio(listaPrecio);
                             repository.save(articuloDB);
-                        }catch (Exception e){
-                            System.err.println("Error al intengar guardar el articulo: " + e.getMessage());
                         }
+                    } catch (Exception e) {
+                        System.err.println("Error al procesar el sku " + sku + ": " + e.getMessage());
                     }
                 }
                 return "Proceso de migrado articulo terminado.";
