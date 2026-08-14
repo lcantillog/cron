@@ -57,6 +57,7 @@ public class ProductoService implements ProductoInterfaz {
             MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
             headerss.add("Content-Type", "application/json");
             headerss.add("x-api-key", property.getPass_palatsi_prod_new());
+            headerss.add("User-Agent", "Palatsi-Sync/1.0");
 
             HttpEntity<Object> param = new HttpEntity<Object>(headerss);
             ResponseEntity<SkuDto> response = restTemplate.exchange(property.getPalatsi_prod_new(), HttpMethod.GET,

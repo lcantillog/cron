@@ -1,5 +1,7 @@
 package com.cron.palatsi.cron.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cron.palatsi.cron.dto.ProcesoDTO;
 import com.cron.palatsi.cron.entity.Pagina;
 import com.cron.palatsi.cron.repository.PaginaRepository;
@@ -43,6 +45,16 @@ public class ProcesoService implements ProcesoInterfaz {
     @Autowired
     private final PaginaRepository paginaRepository;
     private final Log LOGGER = LogFactory.getLog(this.getClass());
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private String toJson(Object value) {
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            LOGGER.info("Error al convertir request a JSON ->" + e.getMessage());
+            return String.valueOf(value);
+        }
+    }
 
     @Override
     public List<Proceso> listAllProceso() {
@@ -269,7 +281,7 @@ public class ProcesoService implements ProcesoInterfaz {
                                         .precio(proceso.getPrecio())
                                         .precioAnterior(proceso.getPrecioAnterior())
                                         .path(url)
-                                        .request(prod.toString())
+                                        .request(toJson(prod))
                                         .codigoEstado(response.getStatusCode().toString())
                                         .response(response.getBody()).build();
                                 hisotryRepository.save(history);
@@ -313,11 +325,12 @@ public class ProcesoService implements ProcesoInterfaz {
             MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
             headerss.add("Content-Type", "application/json");
             headerss.add("x-api-key", password);
+            headerss.add("User-Agent", "Palatsi-Sync/1.0");
             String urlBase = url +"update_product";
             HttpEntity<Object> param = new HttpEntity<Object>(listProcesoDTO, headerss);
             ResponseEntity<String> response = restTemplate.exchange(urlBase, HttpMethod.POST,
                     param, String.class);
-            String request = listProcesoDTO.toString();
+            String request = toJson(listProcesoDTO);
             LOGGER.info("getStatusCode ->" + response.getStatusCode());
             LOGGER.info("Status getBody ->" + response.getBody());
             LOGGER.info("Status getBody ->" + param.getBody());
