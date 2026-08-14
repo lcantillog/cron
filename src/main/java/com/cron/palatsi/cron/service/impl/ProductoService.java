@@ -1,6 +1,7 @@
 package com.cron.palatsi.cron.service.impl;
 
 import com.cron.palatsi.cron.config.pojo.Property;
+import com.cron.palatsi.cron.dto.MarkProcessedDto;
 import com.cron.palatsi.cron.dto.SkuDto;
 import com.cron.palatsi.cron.entity.Articulo;
 import com.cron.palatsi.cron.service.ProductoInterfaz;
@@ -21,7 +22,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.*;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,6 +74,7 @@ public class ProductoService implements ProductoInterfaz {
                     return "No se encontraron productos a migrar.";
                 }
                 Set<String> skusUnicos = new LinkedHashSet<>(respon.products);
+                List<String> skusCreados = new ArrayList<>();
                 for (String sku : skusUnicos) {
                     try {
                         log.info("Service method called using @Slf4j", sku);
@@ -88,10 +92,14 @@ public class ProductoService implements ProductoInterfaz {
                             articuloDB.setCantidad(cantidad);
                             articuloDB.setListaPrecio(listaPrecio);
                             repository.save(articuloDB);
+                            skusCreados.add(sku);
                         }
                     } catch (Exception e) {
                         System.err.println("Error al procesar el sku " + sku + ": " + e.getMessage());
                     }
+                }
+                if (!skusCreados.isEmpty()) {
+                    marcarSkusProcesados(skusCreados);
                 }
                 return "Proceso de migrado articulo terminado.";
             } else {
@@ -114,6 +122,47 @@ public class ProductoService implements ProductoInterfaz {
         }
 
         return "Error al consumir el servicio.";
+    }
+
+    private void marcarSkusProcesados(List<String> skus) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            MultiValueMap<String, String> headerss = new LinkedMultiValueMap<>();
+            headerss.add("Content-Type", "application/json");
+            headerss.add("X-Api-Key", property.getPass_palatsi_prod_new());
+            headerss.add("User-Agent", "Palatsi-Sync/1.0");
+
+            HttpEntity<List<String>> param = new HttpEntity<>(skus, headerss);
+            ResponseEntity<MarkProcessedDto> response = restTemplate.exchange(
+                    urlMarkProcessed(), HttpMethod.POST,
+                    param, new ParameterizedTypeReference<MarkProcessedDto>() {
+                    });
+
+            MarkProcessedDto body = response.getBody();
+            if (body != null) {
+                log.info("mark_processed -> marcados: {}, ya_estaban: {}, no_existen: {}",
+                        body.marcados, body.ya_estaban, body.no_existen);
+                if (body.no_existen != null && !body.no_existen.isEmpty()) {
+                    System.err.println("mark_processed reporta SKU no encontrados en la tienda: " + body.no_existen);
+                }
+            }
+        } catch (HttpClientErrorException | HttpServerErrorException ex) {
+            System.err.println("Error de respuesta HTTP en mark_processed: " + ex.getStatusCode() + " - " + ex.getResponseBodyAsString());
+        } catch (ResourceAccessException ex) {
+            System.err.println("Error de acceso al recurso en mark_processed: " + ex.getMessage());
+        } catch (RestClientException ex) {
+            System.err.println("Error en RestTemplate en mark_processed: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.err.println("Error inesperado en mark_processed: " + ex.getMessage());
+        }
+    }
+
+    private String urlMarkProcessed() {
+        String urlBase = property.getPalatsi_prod_new();
+        int idx = urlBase.lastIndexOf('/');
+        String prefijo = idx >= 0 ? urlBase.substring(0, idx + 1) : urlBase;
+        return prefijo + "mark_processed/";
     }
 
     public String getUrl(String key) {
