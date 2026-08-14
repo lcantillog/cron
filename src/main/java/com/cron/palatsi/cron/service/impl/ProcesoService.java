@@ -27,6 +27,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.*;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -362,6 +363,12 @@ public class ProcesoService implements ProcesoInterfaz {
 
         return procesoList.stream()
                 .filter(Objects::nonNull)
+                .collect(Collectors.toMap(
+                        Proceso::getSku,
+                        Function.identity(),
+                        this::masReciente,
+                        LinkedHashMap::new
+                )).values().stream()
                 .map(a ->
                         {
                         return   ProcesoDTO.builder()
@@ -371,6 +378,20 @@ public class ProcesoService implements ProcesoInterfaz {
                                     .price(a.getPrecio()).build();
                         }
                 ).collect(Collectors.toList());
+    }
+
+    private Proceso masReciente(Proceso a, Proceso b) {
+        if (a.getFecha() == null) {
+            return b;
+        }
+        if (b.getFecha() == null) {
+            return a;
+        }
+        int comparacion = a.getFecha().compareTo(b.getFecha());
+        if (comparacion != 0) {
+            return comparacion > 0 ? a : b;
+        }
+        return a.getId() > b.getId() ? a : b;
     }
 
     private void procesoHistoricoAndEliminacionInfo(Pagina pagina,
